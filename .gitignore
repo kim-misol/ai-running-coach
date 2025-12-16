@@ -7,6 +7,7 @@ __pycache__/
 .pytest_cache/
 backend/.venv
 backend/.env
+python*
 
 # Node/Next.js (Frontend)
 node_modules/

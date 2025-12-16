@@ -8,5 +8,8 @@ class Settings(BaseSettings):
     GARMIN_PASSWORD: str = os.getenv("GARMIN_PASSWORD", "")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
+    class Config:
+        env_file = ".env"
+
 
 settings = Settings()

@@ -13,6 +13,7 @@ garminconnect = "^0.2.0"
 openai = "^1.12.0"
 python-dotenv = "^1.0.0"
 black = "^25.12.0"
+pydantic-settings = "^2.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

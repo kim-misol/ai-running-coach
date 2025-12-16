@@ -1,16 +1,23 @@
 from datetime import datetime
+from typing import Any, Dict, List
 
 from fastapi import Depends, FastAPI, HTTPException
 
-from app.models import AnalysisRequest, CoachFeedback
+from app.models import AnalysisRequest, CoachFeedback, RunningMetrics
 from app.services.ai_coach import AICoachService
-from app.services.garmin_service import GarminService  # 가상의 서비스
+from app.services.garmin_service import GarminService
 
 app = FastAPI(
     title="AI Running Coach API",
     description="Garmin 데이터를 분석하여 러닝 피드백을 제공하는 API",
     version="1.0.0",
 )
+
+
+# 프론트엔드 AnalysisResponse와 일치하는 응답 모델 정의
+class FullAnalysisResponse(CoachFeedback):
+    metrics: RunningMetrics
+    chart_data: List[Dict[str, Any]]
 
 
 # Dependency Injection
@@ -30,7 +37,7 @@ async def health_check():
 
 @app.post(
     "/api/v1/analyze",
-    response_model=CoachFeedback,
+    response_model=FullAnalysisResponse,
     summary="러닝 데이터 분석 요청",
     description="Garmin 활동 ID를 받아 데이터를 가져온 후 AI 코칭 결과를 반환합니다.",
 )
@@ -40,7 +47,10 @@ async def analyze_workout(
     garmin: GarminService = Depends(get_garmin_service),
 ):
     # 1. Garmin 데이터 Fetch
-    activity_data = await garmin.get_activity(request.activity_id)
+    try:
+        activity_data = await garmin.get_activity(request.activity_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Garmin Error: {str(e)}")
 
     if not activity_data:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -48,7 +58,16 @@ async def analyze_workout(
     # 2. AI 분석 수행
     feedback = await coach.analyze_running_session(activity_data)
 
-    return feedback
+    # 3. 차트 데이터 생성 (현재는 AI 서비스 내부 메서드로 시뮬레이션)
+    chart_data = coach._generate_chart_data_from_real_metrics(activity_data)
+
+    # 4. 프론트엔드 포맷에 맞춰 데이터 합치기
+    # Pydantic 모델 -> Dict 변환 후 병합
+    response_data = feedback.model_dump()
+    response_data["metrics"] = activity_data
+    response_data["chart_data"] = chart_data
+
+    return response_data
 
 
 if __name__ == "__main__":

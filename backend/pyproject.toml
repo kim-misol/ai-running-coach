@@ -19,6 +19,8 @@ pydantic-settings = "^2.12.0"
 pytest = "^8.0.0"
 ruff = "^0.2.0"
 mypy = "^1.8.0"
+pytest-asyncio = "^1.3.0"
+httpx = "0.27.2"  # [Fix] 0.28.0 버전의 Breaking Change 방지
 
 [build-system]
 requires = ["poetry-core"]
@@ -27,3 +29,13 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    ".",
+]

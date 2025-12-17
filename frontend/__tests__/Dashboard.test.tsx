@@ -1,28 +1,32 @@
-// frontend/__tests__/Dashboard.test.tsx
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import Page from '@/app/page' // QueryProvider가 감싸진 Page 컴포넌트
+import Page from '@/app/page' // QueryProvider 포함된 최상위 컴포넌트
+import { useRunningAnalysis } from '@/hooks/useRunningData'
 
-// useRunningData 훅 Mocking
+// 1. Mock the module
 jest.mock('@/hooks/useRunningData', () => ({
   useRunningAnalysis: jest.fn()
 }))
 
-import { useRunningAnalysis } from '@/hooks/useRunningData'
+// 2. Create a typed mock helper
+const mockUseRunningAnalysis = useRunningAnalysis as jest.MockedFunction<typeof useRunningAnalysis>
+
 
 describe('Dashboard Page', () => {
   it('renders loading state initially', () => {
-    (useRunningAnalysis as jest.Mock).mockReturnValue({
+    // 3. Use the typed mock
+    mockUseRunningAnalysis.mockReturnValue({
       isLoading: true,
-      data: null
-    })
+      data: undefined,
+      isError: false 
+    } as any)
 
     render(<Page />)
     expect(screen.getByText('Analyzing your run...')).toBeInTheDocument()
   })
 
   it('renders dashboard with data successfully', () => {
-    (useRunningAnalysis as jest.Mock).mockReturnValue({
+    mockUseRunningAnalysis.mockReturnValue({
       isLoading: false,
       isError: false,
       data: {
@@ -42,7 +46,7 @@ describe('Dashboard Page', () => {
         race_predictions: [],
         chart_data: []
       }
-    })
+    } as any)
 
     render(<Page />)
     
@@ -53,11 +57,11 @@ describe('Dashboard Page', () => {
   })
 
   it('renders error state', () => {
-    (useRunningAnalysis as jest.Mock).mockReturnValue({
+    mockUseRunningAnalysis.mockReturnValue({
       isLoading: false,
       isError: true,
-      data: null
-    })
+      data: undefined
+    } as any)
 
     render(<Page />)
     expect(screen.getByText('Failed to load data.')).toBeInTheDocument()

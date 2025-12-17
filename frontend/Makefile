@@ -10,6 +10,10 @@ dev:
 	@echo "🚀 Starting frontend development server..."
 	$(PM) run dev
 
+run:
+	@echo "🚀 Starting frontend development server..."
+	$(PM) run dev
+
 build:
 	@echo "🏗 Building frontend for production..."
 	$(PM) run build

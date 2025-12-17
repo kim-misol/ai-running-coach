@@ -23,6 +23,13 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      # debugging step to inspect the file system
+      - name: Debug File System
+        run: |
+          echo "현재 위치: $(pwd)"
+          echo "파일 리스트:"
+          ls -R
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

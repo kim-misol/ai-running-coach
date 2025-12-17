@@ -30,7 +30,7 @@ type-check:
 test:
 	@echo "🧪 Running Tests..."
 	# 테스트 스크립트가 있다면 실행 (현재는 echo만)
-	@echo "No tests specified yet."
+	$(PM) test
 
 clean:
 	@echo "🧹 Cleaning cache..."
